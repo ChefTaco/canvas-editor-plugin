@@ -64,7 +64,11 @@ export function auditWordProperties(part: Node, lose: Loss, alreadyReported: Rea
         if (property.namespaceURI !== w || !supported.has(name) && !alreadyReported.has(name) && !paragraphMark) lose(run ? 'SOURCE_RUN_PROPERTY_UNSUPPORTED' : 'SOURCE_PARAGRAPH_PROPERTY_UNSUPPORTED', `Unsupported ${run ? 'run' : 'paragraph'} property ${name} remains only in the original.`)
         if (seen.has(name)) lose('SOURCE_PROPERTY_DUPLICATE', 'Repeated run/paragraph properties require explicit conversion handling.'); seen.add(name)
       }
-      if (run) readTextTypography(node, lose); else readTabStops(node, lose)
+      if (run) {
+        readTextTypography(node, lose)
+        const underline = child(node, 'u')
+        if (underline && (!supportedAttributes(underline, ['val']) || ![null, 'single', 'none'].includes(val(underline)))) lose('SOURCE_RUN_UNDERLINE_UNSUPPORTED', 'Underline variants, colors and additional attributes are not represented by the boolean underline model; exact appearance remains only in the original.')
+      } else readTabStops(node, lose)
     }
     for (const element of elements(node)) visit(element)
   }

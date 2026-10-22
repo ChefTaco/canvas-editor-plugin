@@ -1,4 +1,5 @@
 import {documentTheme} from './theme'
+import { auditNumbering } from './numbering'
 import { auditWordProperties, readTextTypography, readTabStops } from './typography'
 import { readEmbeddedFonts, type WordEmbeddedFont } from './fonts'
 import { readBorders, readShading, readTablePresentation, readCellPresentation } from './appearance'
@@ -129,6 +130,7 @@ export async function importDocx(bytes: Buffer): Promise<DocxConversion> {
     for (const alignment of Array.from(part.getElementsByTagNameNS(w, 'lvlJc'))) if (['start','end'].includes(val(alignment) ?? '')) lose('SOURCE_LIST_LEVEL_ALIGNMENT', 'Source logical list-level alignment is not retained as a separate numbering definition; original numbering XML remains preserved.')
   }
 
+  auditNumbering(files, lose)
   for (const [name, message] of Object.entries(unsupported)) {
     const count = unsupportedCounts.get(name)??0
     if (count) {
