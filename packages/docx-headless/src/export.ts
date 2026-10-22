@@ -99,6 +99,7 @@ export async function exportDocx(raw: WordDocument, mode: ExportMode, assets: Ma
       style.lineSpacing!==undefined||style.before!==undefined||style.after!==undefined?`<w:spacing${style.lineSpacing===undefined?'':` w:line="${Math.round(style.lineSpacing*(style.lineRule==='exact'||style.lineRule==='atLeast'?15:240))}" w:lineRule="${style.lineRule??'auto'}"`}${style.before===undefined?'':` w:before="${twips(style.before)}"`}${style.after===undefined?'':` w:after="${twips(style.after)}"`}/>`:'',
       style.indent!==undefined||style.rightIndent!==undefined||style.firstLineIndent!==undefined?`<w:ind${style.indent===undefined?'':` w:left="${twips(style.indent)}"`}${style.rightIndent===undefined?'':` w:right="${twips(style.rightIndent)}"`}${style.firstLineIndent===undefined?'':` ${style.firstLineIndent<0?'w:hanging':'w:firstLine'}="${twips(Math.abs(style.firstLineIndent))}"`}/>`:'',
       style.alignment ? `<w:jc w:val="${style.alignment === 'justify' ? 'both' : style.alignment}"/>` : '',
+      style.heading ? `<w:outlineLvl w:val="${style.heading - 1}"/>` : '',
     ].join('')
   const imageRun = (block: { id: string; assetId: number; sha256: string; alt: string; width: number; height: number }): string => {
       const asset = assets.get(block.assetId)
