@@ -23,6 +23,22 @@ export async function exportDocxSections(input: WordPackageInput, mode: ExportMo
   if (input.sections.some(section => section.document.compatibilityMode !== input.sections[0]?.document.compatibilityMode)) throw new WordCodecError('EXPORT_COMPATIBILITY_CONFLICT','Sections cannot replace document-wide compatibility settings.',409)
   const nativeRanges=input.sections.reduce((count,section)=>count+section.document.comments.length,0)
   if(mode==='retain-review'&&nativeRanges>32767)throw new WordCodecError('EXPORT_COMMENT_RANGE_LIMIT','Word supports at most 32767 native comment ranges per document. Resolve review or export an explicit final/original projection with review sidecar.',409,{nativeRanges,maximum:32767})
+  // Single-scene export supplies blank stories to clear Word inheritance. A
+  // package that never owns that story needs neither a reference nor a part;
+  // retaining those placeholders would manufacture paragraphs on reimport.
+  // If any scene owns the story, keep every clearing reference unchanged.
+  const absentStories = new Set<string>(['header', 'footer'].filter(kind =>
+    input.sections.every(section => {
+      const blocks = kind === 'header'
+        ? section.stories?.header?.blocks ?? section.document.layout.header
+        : section.stories?.footer?.blocks ?? section.document.layout.footer
+      return !blocks.length && (kind !== 'footer' || !section.document.layout.pageNumbers)
+    })
+  ))
+  const absentStoryPart = (name: string): boolean => {
+    const kind = /^word\/(?:_rels\/)?(header|footer)\d+\.xml(?:\.rels)?$/u.exec(name)?.[1]
+    return kind !== undefined && absentStories.has(kind)
+  }
   const files: ZipEntry[] = []
   const body: string[] = []
   const relationships: string[] = []
@@ -46,6 +62,9 @@ export async function exportDocxSections(input: WordPackageInput, mode: ExportMo
     if(sourceDefaults){const content=serialize(sourceDefaults);if(defaults.length&&defaults[0]!==content)throw new WordCodecError('EXPORT_DEFAULTS_CONFLICT','Sections cannot silently replace document-wide defaults.',409);if(!defaults.length)defaults.push(content)}
     const prefix = `section-${sectionIndex}`
     const doc = parseDocumentXml(source.get('word/document.xml')!)
+    for (const kind of absentStories)
+      for (const reference of Array.from(doc.getElementsByTagNameNS(w, kind + 'Reference')))
+        reference.parentNode?.removeChild(reference)
     const relationshipMap = new Map<string, string>()
     const sourceRelations = parseDocumentXml(
       source.get('word/_rels/document.xml.rels')!,
@@ -54,6 +73,7 @@ export async function exportDocxSections(input: WordPackageInput, mode: ExportMo
       const element = sourceRelations.item(index)!
       const type = element.getAttribute('Type')!
       if (/\/(styles|numbering|comments|settings|fontTable)$/.test(type)) continue
+      if (Array.from(absentStories).some(kind => type.endsWith('/' + kind))) continue
       const id = `rId${++relationshipIndex}`
       relationshipMap.set(element.getAttribute('Id')!, id)
       element.setAttribute('Id', id)
@@ -185,6 +205,7 @@ export async function exportDocxSections(input: WordPackageInput, mode: ExportMo
     for (let index = 0; index < sourceTypes.length; index++) {
       const type = sourceTypes.item(index)!
       const part = type.getAttribute('PartName')!
+      if (absentStoryPart(part.replace(/^\//u, ''))) continue
       if (
         [
           '/word/document.xml',
@@ -201,7 +222,7 @@ export async function exportDocxSections(input: WordPackageInput, mode: ExportMo
     }
     for (const [name, bytes] of source)
       if (
-        name.startsWith('word/') && !name.startsWith('word/fonts/') &&
+        name.startsWith('word/') && !name.startsWith('word/fonts/') && !absentStoryPart(name) &&
         ![
           'word/document.xml',
           'word/styles.xml',
