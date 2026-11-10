@@ -37,14 +37,14 @@
   },
   "devDependencies": {
     "@hufe921/canvas-editor": "0.9.86",
-    "@rollup/plugin-typescript": "^10.0.1",
+    "@rollup/plugin-typescript": "^12.3.0",
     "@types/color": "^3.0.4",
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
     "eslint": "7.32.0",
     "simple-git-hooks": "^2.8.1",
     "typescript": "^5.0.2",
-    "vite": "^4.3.9"
+    "vite": "^6.4.5"
   },
   "dependencies": {
     "exceljs": "^4.4.0"

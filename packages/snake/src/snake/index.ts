@@ -78,8 +78,15 @@ function snakePlugin(editor: Editor, defaultOptions?: ISnakeOption) {
   }
 
   const watchMessage = (evt: MessageEvent) => {
+    if (evt.origin !== window.location.origin) return
     const data = evt.data
-    if (!data || typeof data.type !== 'string' || !data.gameId) return
+    if (!data || typeof data.type !== 'string' || typeof data.gameId !== 'string') return
+    const entry = gameRegistry.get(data.gameId)
+    if (!entry) return
+    const iframe = command
+      .getContainer()
+      .querySelector<HTMLIFrameElement>(`iframe[data-id="${entry.blockId}"]`)
+    if (!iframe || evt.source !== iframe.contentWindow) return
     if (
       data.type !== SNAKE_MESSAGE_TYPE &&
       data.type !== SNAKE_SCORE_MESSAGE_TYPE
