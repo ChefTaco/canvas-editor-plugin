@@ -37,14 +37,14 @@
   },
   "devDependencies": {
     "@hufe921/canvas-editor": "0.9.58",
-    "@rollup/plugin-typescript": "^10.0.1",
+    "@rollup/plugin-typescript": "^12.3.0",
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
     "eslint": "7.32.0",
     "sass": "^1.69.2",
     "simple-git-hooks": "^2.8.1",
     "typescript": "^5.0.2",
-    "vite": "^4.3.9",
+    "vite": "^6.4.5",
     "vite-plugin-css-injected-by-js": "^3.3.0"
   },
   "dependencies": {

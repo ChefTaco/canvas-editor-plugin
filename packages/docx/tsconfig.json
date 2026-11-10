@@ -1,8 +1,15 @@
 {
-  "extends": ["../../tsconfig.json"],
+  "extends": [
+    "../../tsconfig.json"
+  ],
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": ""
+    "rootDir": "",
+    "paths": {
+      "@/editor/interface/Print": [
+        "./node_modules/@hufe921/canvas-editor/dist/src/editor/interface/Print.d.ts"
+      ]
+    }
   },
   "include": [
     "./src/**/*.ts"
