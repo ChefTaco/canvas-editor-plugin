@@ -116,7 +116,7 @@ pnpm release:package    # from-package
 
 ## Git Hooks
 
-Pre-commit runs linting. Commit messages are verified via `scripts/verifyCommit.js`.
+Pre-commit scans the staged index with Gitleaks and runs linting; pre-push scans outgoing commits with Gitleaks (see `CONTRIBUTING.md`). Commit messages are verified via `scripts/verifyCommit.js`.
 
 ## Existing Plugins Reference
 

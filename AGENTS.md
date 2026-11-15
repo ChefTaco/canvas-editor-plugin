@@ -146,8 +146,11 @@ export default function myPlugin(editor: Editor) {
 
 ## Git Hooks
 
-- **pre-commit**: Runs `npm run lint`
-- **commit-msg**: Validates commit message format
+Hooks are installed by `simple-git-hooks` on `pnpm install`; see `CONTRIBUTING.md` for the Gitleaks setup.
+
+- **pre-commit**: Scans the staged index with Gitleaks, then runs `npm run lint`
+- **commit-msg**: Validates commit message format (`scripts/verifyCommit.js`)
+- **pre-push**: Scans outgoing commits with Gitleaks
 
 ## Commit Message Format
 
