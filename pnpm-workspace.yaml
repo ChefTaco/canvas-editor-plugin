@@ -33,9 +33,3 @@ onlyBuiltDependencies:
   - esbuild
   - nx
   - simple-git-hooks
-
-# Dev-only tooling advisory with no fixed release; see SECURITY-CHANGES.md.
-# Remove once picomatch publishes a fix.
-auditConfig:
-  ignoreGhsas:
-    - GHSA-fc5q-39xc-vjpf

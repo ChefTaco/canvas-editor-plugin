@@ -13,13 +13,11 @@
 - CI runs the audit, typecheck, lint, browser regression, library/demo builds and
   documentation build on Node 24 and 26. Secret scanning and push protection are
   complemented by Dependabot and CodeQL monitoring.
-- 2026-11-18: `pnpm audit` ignores exactly GHSA-fc5q-39xc-vjpf (picomatch
-  <=4.0.7 ReDoS through repeated extglobs). picomatch is reachable only from
-  dev-only tooling (`@typescript-eslint` via globby, fast-glob and micromatch;
-  `lerna` via tinyglobby), never from a production dependency
-  (`pnpm audit --prod` is clean), and no fixed release exists. Remove the
-  `auditConfig.ignoreGhsas` entry in `pnpm-workspace.yaml` once picomatch
-  publishes a fix.
+- Remove the temporary `pnpm audit` exception for picomatch after GitHub
+  withdrew the advisory on 2026-11-18. Picomatch remains a development-only
+  dependency. The advisory still lists no patched version, and the locked
+  dependency versions are unchanged.
+  [GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf)
 
 These are changes to this maintained fork. They do not publish packages under
 upstream's npm scope or submit changes to the upstream project.
